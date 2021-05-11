@@ -1,5 +1,3 @@
-import { bookables } from '../../static.json';
-
 interface State {
   bookables: any[],
   group: any;
