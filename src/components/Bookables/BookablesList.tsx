@@ -1,25 +1,47 @@
 import { bookables, sessions, days } from '../../static.json';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useReducer, useState } from 'react';
 import { FaArrowRight } from "react-icons/all";
+import reducer from "./reducer";
+
+const initialState = {
+  group: "Rooms",
+  bookableIndex: 0,
+  hasDetails: true,
+  bookables
+}
 
 export default function BookablesList() {
-  const [group, setGroup] = useState('Kit');
-  const bookablesInGroup = bookables.filter(b => b.group === group);
-  const [bookableIndex, setBookableIndex] = useState(0);
-  const groups = [...new Set(bookables.map(b => b.group)) as any];
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { group, bookableIndex, bookables, hasDetails } = state;
 
+  const groups = [...new Set(bookables.map(b => b.group)) as any];
+  const bookablesInGroup = bookables.filter(b => b.group === group);
   const bookable = bookablesInGroup[bookableIndex];
 
-  const [hasDetails, setHasDetails] = useState(false);
+  function changeGroup(e: any) {
+    dispatch({
+      type: 'SET_GROUP',
+      payload: e.target.value
+    });
+  }
 
-  const changeBookable = useCallback((i) => setBookableIndex(i), []);
+  function changeBookable(selectedIndex: number) {
+    dispatch({ type: 'SET_BOOKABLE', payload: selectedIndex });
+  }
 
-  const nextBookable = () => setBookableIndex(i => (i + 1) % bookablesInGroup.length);
+  function nextBookable() {
+    dispatch({ type: 'NEXT_BOOK' });
+  }
+
+  function toggleDetails() {
+    dispatch({ type: 'TOGGLE_HAS_DETAILS' });
+  }
+
 
   return (
     <React.Fragment>
       <div>
-        <select value={group} onChange={(e) => setGroup(e.target.value)}>
+        <select value={group} onChange={changeGroup}>
           {groups.map(g => <option value={g} key={g}>{g}</option>)}
         </select>
         <ul className="bookables items-list-nav">
@@ -61,7 +83,7 @@ export default function BookablesList() {
                   <input
                     type="checkbox"
                     checked={hasDetails}
-                    onChange={() => setHasDetails(has => !has)}
+                    onChange={toggleDetails}
                   />
                   Show Details
                 </label>
@@ -77,12 +99,12 @@ export default function BookablesList() {
                   <ul>
                     {bookable.days
                       .sort()
-                      .map(d => <li key={d}>{days[d]}</li>)
+                      .map((d: any) => <li key={d}>{days[d]}</li>)
                     }
                   </ul>
                   <ul>
                     {bookable.sessions
-                      .map(s => <li key={s}>{sessions[s]}</li>)
+                      .map((s: any) => <li key={s}>{sessions[s]}</li>)
                     }
                   </ul>
                 </div>
