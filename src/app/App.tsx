@@ -10,6 +10,7 @@ import BookingsPage from "../pages/BookingsPage";
 import BookablesPage from "../pages/BookablesPage";
 import UsersPage from "../pages/UsersPage";
 import {FaCalendarAlt, FaDoorOpen, FaUsers} from "react-icons/all";
+import UserPicker from "../components/Users/UserPicker";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
               </li>
             </ul>
           </nav>
+          <UserPicker/>
         </header>
       </div>
       <Switch>
