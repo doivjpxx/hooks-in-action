@@ -1,22 +1,37 @@
 import { bookables, sessions, days } from '../../static.json';
-import React, { useCallback, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { FaArrowRight } from "react-icons/all";
 import reducer from "./reducer";
+import getData from "../../utils/api";
+import Spinner from "../../ui/Spinner";
 
 const initialState = {
   group: "Rooms",
   bookableIndex: 0,
   hasDetails: true,
-  bookables
+  bookables: [],
+  isLoading: true,
+  error: false,
 }
 
 export default function BookablesList() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { group, bookableIndex, bookables, hasDetails } = state;
+  const { group, bookableIndex, bookables, hasDetails, error, isLoading } = state;
 
-  const groups = [...new Set(bookables.map(b => b.group)) as any];
-  const bookablesInGroup = bookables.filter(b => b.group === group);
+  const groups = [...new Set(bookables.map((b: any) => b.group)) as any];
+  const bookablesInGroup = bookables.filter((b: any) => b.group === group);
   const bookable = bookablesInGroup[bookableIndex];
+
+  useEffect(() => {
+    dispatch({ type: 'FETCH_BOOKABLES_REQUEST'});
+    getData("http://localhost:3001/bookables").then(bookables => dispatch({
+      type: 'FETCH_BOOKABLES_SUCCESS',
+      payload: bookables
+    })).catch(err => dispatch({
+      type: 'FETCH_BOOKABLES_FAIL',
+      payload: err
+    }));
+  }, [])
 
   function changeGroup(e: any) {
     dispatch({
@@ -38,6 +53,14 @@ export default function BookablesList() {
   }
 
 
+  if (error) {
+    return <p>{error.message}</p>
+  }
+
+  if (isLoading) {
+    return <p><Spinner/> Loading bookables...</p>
+  }
+
   return (
     <React.Fragment>
       <div>
@@ -45,7 +68,7 @@ export default function BookablesList() {
           {groups.map(g => <option value={g} key={g}>{g}</option>)}
         </select>
         <ul className="bookables items-list-nav">
-          {bookablesInGroup.map((b, i) => (
+          {bookablesInGroup.map((b: any, i: number) => (
             <li
               className={i === bookableIndex ? "selected" : ''}
               key={b.id}

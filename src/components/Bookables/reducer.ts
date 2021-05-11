@@ -1,8 +1,10 @@
 interface State {
-  bookables: any[],
+  bookables: any[];
   group: any;
   bookableIndex: number;
   hasDetails: boolean;
+  isLoading: boolean;
+  error: boolean;
 }
 
 export default function reducer(state: State, action: any) {
@@ -25,6 +27,29 @@ export default function reducer(state: State, action: any) {
         ...state,
         bookableIndex: (state.bookableIndex + 1) % +count,
       };
-    default: return state;
+
+    case "FETCH_BOOKABLES_REQUEST":
+      return {
+        ...state,
+        isLoading: true,
+        error: false,
+        bookables: []
+      };
+
+    case "FETCH_BOOKABLES_SUCCESS":
+      return {
+        ...state,
+        isLoading: false,
+        bookables: action.payload
+      };
+
+    case "FETCH_BOOKABLES_ERROR":
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload
+      };
+    default:
+      return state;
   }
 }
