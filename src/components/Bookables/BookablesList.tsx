@@ -1,5 +1,5 @@
 import { bookables, sessions, days } from '../../static.json';
-import React, { useCallback, useEffect, useReducer, useState } from 'react';
+import React, { Ref, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { FaArrowRight } from "react-icons/all";
 import reducer from "./reducer";
 import getData from "../../utils/api";
@@ -16,6 +16,8 @@ const initialState = {
 
 export default function BookablesList() {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const timerRef = useRef(null);
+  const nextButtonref = useRef();
   const { group, bookableIndex, bookables, hasDetails, error, isLoading } = state;
 
   const groups = [...new Set(bookables.map((b: any) => b.group)) as any];
@@ -31,7 +33,21 @@ export default function BookablesList() {
       type: 'FETCH_BOOKABLES_FAIL',
       payload: err
     }));
-  }, [])
+  }, []);
+
+  // useEffect(() => {
+  //   // @ts-ignore
+  //   timerRef.current = setInterval(() => dispatch({
+  //     type: "NEXT_BOOK"
+  //   }), 3000);
+  //
+  //   return stopPresentation;
+  // });
+
+  function stopPresentation() {
+    // @ts-ignore
+    clearInterval(timerRef.current);
+  }
 
   function changeGroup(e: any) {
     dispatch({
@@ -42,6 +58,8 @@ export default function BookablesList() {
 
   function changeBookable(selectedIndex: number) {
     dispatch({ type: 'SET_BOOKABLE', payload: selectedIndex });
+    // @ts-ignore
+    nextButtonref.current.focus();
   }
 
   function nextBookable() {
@@ -86,6 +104,7 @@ export default function BookablesList() {
           <button
             className="btn"
             onClick={nextBookable}
+            ref={nextButtonref as Ref<any>}
             autoFocus
           >
             <FaArrowRight/>
@@ -110,6 +129,7 @@ export default function BookablesList() {
                   />
                   Show Details
                 </label>
+                <button className="btn" onClick={stopPresentation}>Stop</button>
               </span>
             </div>
 
