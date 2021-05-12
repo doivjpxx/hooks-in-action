@@ -2,7 +2,7 @@ interface State {
   bookables: any[];
   group: any;
   bookableIndex: number;
-  hasDetails: boolean;
+  // hasDetails: boolean;
   isLoading: boolean;
   error: boolean;
 }
@@ -17,10 +17,10 @@ export default function reducer(state: State, action: any) {
       };
     case 'SET_BOOKABLE':
       return { ...state, bookableIndex: action.payload };
-    case 'TOGGLE_HAS_DETAILS':
-      return {
-        ...state, hasDetails: !state.hasDetails
-      };
+    // case 'TOGGLE_HAS_DETAILS':
+    //   return {
+    //     ...state, hasDetails: !state.hasDetails
+    //   };
     case 'NEXT_BOOK':
       const count = state.bookables.filter(b => b.group === state.group);
       return {

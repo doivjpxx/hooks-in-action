@@ -4,6 +4,7 @@ import { FaArrowRight } from "react-icons/all";
 import reducer from "./reducer";
 import getData from "../../utils/api";
 import Spinner from "../../ui/Spinner";
+import BookableDetails from "./BookableDetails";
 
 const initialState = {
   group: "Rooms",
@@ -14,18 +15,16 @@ const initialState = {
   error: false,
 }
 
-export default function BookablesList() {
-  const [state, dispatch] = useReducer(reducer, initialState);
+export default function BookablesList({ state, dispatch}: {state: any, dispatch: any}) {
   const timerRef = useRef(null);
   const nextButtonref = useRef();
   const { group, bookableIndex, bookables, hasDetails, error, isLoading } = state;
 
   const groups = [...new Set(bookables.map((b: any) => b.group)) as any];
   const bookablesInGroup = bookables.filter((b: any) => b.group === group);
-  const bookable = bookablesInGroup[bookableIndex];
 
   useEffect(() => {
-    dispatch({ type: 'FETCH_BOOKABLES_REQUEST'});
+    dispatch({ type: 'FETCH_BOOKABLES_REQUEST' });
     getData("http://localhost:3001/bookables").then(bookables => dispatch({
       type: 'FETCH_BOOKABLES_SUCCESS',
       payload: bookables
@@ -33,21 +32,7 @@ export default function BookablesList() {
       type: 'FETCH_BOOKABLES_FAIL',
       payload: err
     }));
-  }, []);
-
-  // useEffect(() => {
-  //   // @ts-ignore
-  //   timerRef.current = setInterval(() => dispatch({
-  //     type: "NEXT_BOOK"
-  //   }), 3000);
-  //
-  //   return stopPresentation;
-  // });
-
-  function stopPresentation() {
-    // @ts-ignore
-    clearInterval(timerRef.current);
-  }
+  }, [dispatch]);
 
   function changeGroup(e: any) {
     dispatch({
@@ -65,11 +50,6 @@ export default function BookablesList() {
   function nextBookable() {
     dispatch({ type: 'NEXT_BOOK' });
   }
-
-  function toggleDetails() {
-    dispatch({ type: 'TOGGLE_HAS_DETAILS' });
-  }
-
 
   if (error) {
     return <p>{error.message}</p>
@@ -113,49 +93,6 @@ export default function BookablesList() {
         </p>
       </div>
 
-      {bookable && (
-        <div className="bookable-details">
-          <div className="item">
-            <div className="item-header">
-              <h2>
-                {bookable.title}
-              </h2>
-              <span className="controls">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={hasDetails}
-                    onChange={toggleDetails}
-                  />
-                  Show Details
-                </label>
-                <button className="btn" onClick={stopPresentation}>Stop</button>
-              </span>
-            </div>
-
-            <p>{bookable.notes}</p>
-
-            {hasDetails && (
-              <div className="item-details">
-                <h3>Availability</h3>
-                <div className="bookable-availability">
-                  <ul>
-                    {bookable.days
-                      .sort()
-                      .map((d: any) => <li key={d}>{days[d]}</li>)
-                    }
-                  </ul>
-                  <ul>
-                    {bookable.sessions
-                      .map((s: any) => <li key={s}>{sessions[s]}</li>)
-                    }
-                  </ul>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </React.Fragment>
   );
 }

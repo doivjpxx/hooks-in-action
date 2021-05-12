@@ -1,9 +1,9 @@
-import BookablesList from "../components/Bookables/BookablesList";
+import BookablesView from "../components/Bookables/BookablesView";
 
 export default function BookablesPage() {
   return (
     <main className="bookables-page">
-      <BookablesList/>
+      <BookablesView/>
     </main>
   );
 }

@@ -44,6 +44,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-icons": "^3.0.0",
     "@types/react-router": "^5.1.14",
     "@types/react-router-dom": "^5.1.7"
   }
