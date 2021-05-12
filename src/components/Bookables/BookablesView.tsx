@@ -13,17 +13,10 @@ const initialState = {
 }
 
 export default function BookablesView () {
-  const [bookable, setBookable] = useState();
-
-  const updateBookable = useCallback((selected: any) => {
-    if (selected) {
-      selected.lastShown = Date.now();
-      setBookable(selected);
-    }
-  }, [])
+  const [bookable, setBookable] = useState(null);
 
   return <Fragment>
-    <BookablesList bookable={bookable} setBookable={updateBookable} />
+    <BookablesList bookable={bookable} setBookable={setBookable} />
     <BookableDetails bookable={bookable} />
   </Fragment>
 }
