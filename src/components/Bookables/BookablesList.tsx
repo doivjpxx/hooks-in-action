@@ -15,44 +15,57 @@ const initialState = {
   error: false,
 }
 
-export default function BookablesList({ state, dispatch}: {state: any, dispatch: any}) {
-  const timerRef = useRef(null);
-  const nextButtonref = useRef();
-  const { group, bookableIndex, bookables, hasDetails, error, isLoading } = state;
+export default function BookablesList({ bookable, setBookable }: {bookable: any, setBookable: any}) {
+  const [bookables, setBookables] = useState([]);
+  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const groups = [...new Set(bookables.map((b: any) => b.group)) as any];
+  const group = bookable?.group;
+
   const bookablesInGroup = bookables.filter((b: any) => b.group === group);
+  const groups = [...new Set(bookables.map((b: any) => b.group)) as any];
+
+  const nextButtonRef = useRef();
 
   useEffect(() => {
-    dispatch({ type: 'FETCH_BOOKABLES_REQUEST' });
-    getData("http://localhost:3001/bookables").then(bookables => dispatch({
-      type: 'FETCH_BOOKABLES_SUCCESS',
-      payload: bookables
-    })).catch(err => dispatch({
-      type: 'FETCH_BOOKABLES_FAIL',
-      payload: err
-    }));
-  }, [dispatch]);
+    getData("http://localhost:3001/bookables")
+
+      .then(bookables => {
+        setBookable(bookables[0]);
+        setBookables(bookables);
+        setIsLoading(false);
+      })
+
+      .catch(error => {
+        setError(error);
+        setIsLoading(false);
+      });
+  }, [setBookable]);
 
   function changeGroup(e: any) {
-    dispatch({
-      type: 'SET_GROUP',
-      payload: e.target.value
-    });
+    const bookablesInSelectedGroup = bookables.filter(
+      (b: any) => b.group === e.target.value
+    );
+    setBookable(bookablesInSelectedGroup[0]);
   }
 
-  function changeBookable(selectedIndex: number) {
-    dispatch({ type: 'SET_BOOKABLE', payload: selectedIndex });
+  // @ts-ignore
+  function changeBookable(selectedBookable) {
+    setBookable(selectedBookable);
     // @ts-ignore
-    nextButtonref.current.focus();
+    nextButtonRef.current.focus();
   }
 
   function nextBookable() {
-    dispatch({ type: 'NEXT_BOOK' });
+    // @ts-ignore
+    const i = bookablesInGroup.indexOf(bookable);
+    const nextIndex = (i + 1) % bookablesInGroup.length;
+    const nextBookable = bookablesInGroup[nextIndex];
+    setBookable(nextBookable);
   }
 
   if (error) {
-    return <p>{error.message}</p>
+    return <p>{(error as any).message}</p>
   }
 
   if (isLoading) {
@@ -68,12 +81,12 @@ export default function BookablesList({ state, dispatch}: {state: any, dispatch:
         <ul className="bookables items-list-nav">
           {bookablesInGroup.map((b: any, i: number) => (
             <li
-              className={i === bookableIndex ? "selected" : ''}
+              className={b.id === bookable.id ? "selected" : ''}
               key={b.id}
             >
               <button
                 className="btn"
-                onClick={() => changeBookable(i)}
+                onClick={() => changeBookable(b)}
               >
                 {b.title}
               </button>
@@ -84,7 +97,7 @@ export default function BookablesList({ state, dispatch}: {state: any, dispatch:
           <button
             className="btn"
             onClick={nextBookable}
-            ref={nextButtonref as Ref<any>}
+            ref={nextButtonRef as any}
             autoFocus
           >
             <FaArrowRight/>

@@ -34,14 +34,14 @@ export default function BookableDetails({ bookable }: { bookable: any }) {
             <h3>Availability</h3>
             <div className="bookable-availability">
               <ul>
-                {bookable.days
-                  .sort()
+                {bookable?.days
+                  ?.sort()
                   .map((d: any) => <li key={d}>{days[d]}</li>)
                 }
               </ul>
               <ul>
                 {bookable.sessions
-                  .map((s: any) => <li key={s}>{sessions[s]}</li>)
+                  ?.map((s: any) => <li key={s}>{sessions[s]}</li>)
                 }
               </ul>
             </div>
